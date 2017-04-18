@@ -1,3 +1,3 @@
-=Sailfish OS barcode scanner application
+# Sailfish OS barcode scanner application
 
-WIP
+This is WIP and does not work just yet.
