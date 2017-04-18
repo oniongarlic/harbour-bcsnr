@@ -1,6 +1,8 @@
 import QtQuick 2.6
 import Sailfish.Silica 1.0
-import QtMultimedia 5.5
+import QtMultimedia 5.6
+
+import org.tal 1.0
 
 Page {
     id: page
@@ -22,6 +24,7 @@ Page {
             case Camera.ActiveState:
                 console.debug("DigitalZoom: "+maximumDigitalZoom)
                 console.debug("OpticalZoom: "+maximumOpticalZoom)
+                console.debug("CameraOrientation: "+orientation)
                 break;
             }
         }
@@ -39,13 +42,40 @@ Page {
                 console.debug("Image saved: "+path)
             }
         }
+    }
 
+    BarcodeScanner {
+        id: scanner
+        // enabledFormats: BarcodeScanner.BarCodeFormat_2D | BarcodeScanner.BarCodeFormat_1D
+        enabledFormats: BarcodeScanner.BarCodeFormat_1D
+        rotate: camera.orientation!=0 ? true : false;
+        onTagFound: {
+            console.debug("TAG: "+tag);
+            barcodeText.text=tag;
+        }
+        onDecodingStarted: {
+            console.debug("DECs")
+
+        }
+        onDecodingFinished: {
+            console.debug("DECe")
+            if (succeeded)
+                camera.stop();
+        }
+        onUnknownFrameFormat: {
+            console.debug("Unknown video frame format: "+format)
+            console.debug(width + " x "+height)
+            // scanFatalFailure("Fatal: Unknown video frame format: "+format)
+            camera.stop();
+        }
+        Component.onCompleted: {
+            console.debug("Filter created")
+        }
     }
 
     SilicaFlickable {
         anchors.fill: parent
 
-        // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
         PullDownMenu {
             MenuItem {
                 text: qsTr("About")
@@ -75,8 +105,11 @@ Page {
                 autoOrientation: false // true
                 fillMode: Image.PreserveAspectFit
                 width: parent.width
-                height: page.height/2
-                onOrientationChanged: console.debug("Orientation: "+orientation)
+                height: page.height/1.5
+                onOrientationChanged: console.debug("VideoOutputOrientation: "+orientation)
+
+                filters: [ scanner ]
+
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
@@ -93,6 +126,15 @@ Page {
                     running: camera.lockStatus==Camera.Searching
                 }
             }
+
+            Text {
+                id: barcodeText
+                width: parent.width
+                color: "red"
+                font.pointSize: 22
+                horizontalAlignment: Text.AlignHCenter
+            }
+
         }
     }
 }

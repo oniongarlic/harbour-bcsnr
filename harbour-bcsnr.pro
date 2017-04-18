@@ -14,6 +14,8 @@ TARGET = harbour-bcsnr
 
 CONFIG += sailfishapp
 
+QT += multimedia
+
 SOURCES += src/harbour-bcsnr.cpp
 
 OTHER_FILES += qml/harbour-bcsnr.qml \
@@ -24,6 +26,8 @@ OTHER_FILES += qml/harbour-bcsnr.qml \
     rpm/harbour-bcsnr.yaml \
     translations/*.ts \
     harbour-bcsnr.desktop
+
+include(3rdparty/barcodevideofilter/barcodevideofilter.pri)
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 256x256
 
